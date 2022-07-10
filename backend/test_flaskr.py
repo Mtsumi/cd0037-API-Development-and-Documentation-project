@@ -115,22 +115,38 @@ class TriviaTestCase(unittest.TestCase):
         self.assertTrue(data["success"])
         self.assertIsNone(question)
 
-    # def test_retrieve_categories(self):
-    #     res = self.client().get("/categories")
-    #     data = json.loads(res.data)
+    def test_retrieve_question_for_quiz(self):
+        quiz = {"previous_questions":[], "quiz_category":{"category": "Science", "id": 1}}
+        res = self.client().post("/quizzes", json=quiz)
+        data = json.loads(res.data)
+        self.assertEqual(res.status_code, 200)
+        self.assertEqual(data["success"], True)
+    
+    def test_search(self):
+        res = self.client().post("/questions/search", json={"searchTerm": "kenya"})
+        data = json.loads(res.data)
+
+        self.assertEqual(res.status_code, 200)
+        self.assertEqual(data["success"], True)
+    
+
+
+    def test_retrieve_categories(self):
+        res = self.client().get("/categories")
+        data = json.loads(res.data)
         
-    #     self.assertEqual(res.status_code, 200)
-    #     self.assertEqual(data["success"], True)
-    #     self.assertTrue(data["categories"])
-    #     self.assertTrue(data["total_categories"])
+        self.assertEqual(res.status_code, 200)
+        self.assertEqual(data["success"], True)
+        self.assertTrue(data["categories"])
+        self.assertTrue(data["total_categories"])
 
-    # def test_404_sent_requesting_beyond_valid_categoryId(self):
-    #     res = self.client().get("/categories/7/questions")
-    #     data = json.loads(res.data)
+    def test_404_sent_requesting_beyond_valid_categoryId(self):
+        res = self.client().get("/categories/7/questions")
+        data = json.loads(res.data)
 
-    #     self.assertEqual(res.status_code, 404)
-    #     self.assertEqual(data["success"], False)
-    #     self.assertEqual(data["message"], "resource not found")
+        self.assertEqual(res.status_code, 404)
+        self.assertEqual(data["success"], False)
+        self.assertEqual(data["message"], "resource not found")
 
     
 

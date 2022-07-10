@@ -245,10 +245,10 @@ def create_app(test_config=None):
         data = dict(request.form or request.json or request.data)
         #request.get_json()
         previous_questions = data.get('previous_questions')
-        category = data.get('category')
+        category = data.get('quiz_category')
 
 
-        if not category or previous_questions:
+        if not category:
                 return jsonify(
                     {
                         "success": False,
@@ -256,36 +256,37 @@ def create_app(test_config=None):
                     }
                 )
         
-        try:
-            if category["id"] == 0:
-                all_questions = Question.query.all()
-                    #filter_by(category=category['id']).all()()
-                formatted_questions = [question.format() for question in all_questions]
+        else: 
+            try:
+                if category["id"] == 0:
+                    all_questions = Question.query.all()
+                        #filter_by(category=category['id']).all()()
+                    formatted_questions = [question.format() for question in all_questions]
                     
                     #json.dump(formatted_questions)
 
-            else:
-                all_questions = Question.query.filter_by(Question.category==category['id']).all()
-                formatted_questions = [question.format() for question in all_questions]
-                #Question.query.filter(Question.category.in_(previous_questions)).all(
+                else:
+                    all_questions = Question.query.filter_by(Question.category==category['id']).filter(Question.id.notin_(previous_questions))
+                    formatted_questions = [question.format() for question in all_questions]
+                    #Question.query.filter(Question.category.in_(previous_questions)).all(
                     
                     
 
 
-            rand_question = random.choice(formatted_questions).format() if formatted_questions else None
+                rand_question = random.choice(formatted_questions).format() if formatted_questions else None
 
-            for question in formatted_questions:
-                if question['id'] not in previous_questions:
-                    questions = formatted_questions[rand_question]
+                for question in formatted_questions:
+                    if question['id'] not in previous_questions:
+                        questions = formatted_questions[rand_question]
 
-                return jsonify(
-                    {
-                    "success": True,
-                    "question": questions,
-                    "previous questions": previous_questions
-                })
-        except:
-            abort(404)
+                    return jsonify(
+                        {
+                        "success": True,
+                        "question": questions,
+                        "previous questions": previous_questions
+                    }) 
+            except:
+                abort(404)
 
 
     """
